@@ -1,0 +1,10 @@
+jmx="$1"
+[ -n "$jmx" ] || read -p 'Enter path to the jmx file ' jmx 
+file="${jmx//.jmx}" 
+echo "$file"
+echo "$jmx"
+hel="${file}.jmx"
+echo "$hel"
+mkdir "$file"
+test_name="$(basename "$file").csv"
+echo "$test_name"

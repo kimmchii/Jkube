@@ -11,6 +11,9 @@ tenant=`awk '{print $NF}' "$working_dir/tenant_export"`
 jmx="$1"
 [ -n "$jmx" ] || read -p 'Enter path to the jmx file ' jmx
 
+
+
+
 if [ ! -f "$jmx" ];
 then
     echo "Test script file was not found in PATH"
@@ -19,6 +22,8 @@ then
 fi
 
 test_name="$(basename "$jmx")"
+name="${test_name//.jmx}"
+name_csv="${name}.csv"
 
 #Get Master pod details
 
@@ -26,6 +31,13 @@ master_pod=`kubectl get po -n $tenant | grep jmeter-master | awk '{print $1}'`
 
 kubectl cp "$jmx" -n $tenant "$master_pod:/$test_name"
 
+#Create the directory as a destination of result file
+mkdir "$name"
+
 ## Echo Starting Jmeter load test
 
 kubectl exec -ti -n $tenant $master_pod -- /bin/bash /load_test "$test_name"
+src="$tenant/$master_pod:$name_csv"
+des="$working_dir/$name/$name_csv"
+kubectl cp "$src" "$des"
+
